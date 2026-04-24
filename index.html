@@ -1,41 +1,70 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>YouTube Transcript</title>
+  <title>YouTube Transcript Tool</title>
+  <style>
+    body {
+      font-family: Arial;
+      max-width: 800px;
+      margin: 40px auto;
+    }
+    input, textarea, button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 14px;
+    }
+    textarea {
+      height: 300px;
+    }
+    button {
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
 
-<h2>YouTube → Transkrypt</h2>
+<h2>🎥 YouTube → Transkrypt</h2>
 
-<input id="url" style="width:400px" placeholder="Wklej link YouTube">
-<button onclick="getTranscript()">Pobierz</button>
+<input id="url" placeholder="Wklej link YouTube">
 
-<br><br>
+<button onclick="getTranscript()">Pobierz transkrypt</button>
 
-<textarea id="output" style="width:100%;height:300px"></textarea>
+<textarea id="output" placeholder="Tutaj pojawi się tekst..."></textarea>
 
-<button onclick="copyText()">Kopiuj</button>
+<button onclick="copyText()">📋 Kopiuj</button>
 
 <script>
-
-const API = "https://TWOJ-BACKEND.onrender.com/transcript";
+const API = "https://yt-backhend.onrender.com/transcript";
 
 async function getTranscript() {
   const url = document.getElementById("url").value;
 
-  const res = await fetch(API + "?url=" + encodeURIComponent(url));
-  const data = await res.json();
+  if (!url) {
+    alert("Wklej link YouTube");
+    return;
+  }
 
-  document.getElementById("output").value = data.text || "Brak danych";
+  document.getElementById("output").value = "Ładowanie...";
+
+  try {
+    const res = await fetch(API + "?url=" + encodeURIComponent(url));
+    const data = await res.json();
+
+    document.getElementById("output").value =
+      data.text || "Brak transkryptu lub błąd";
+  } catch (e) {
+    document.getElementById("output").value =
+      "Błąd połączenia z backendem";
+  }
 }
 
 function copyText() {
-  const t = document.getElementById("output");
-  t.select();
+  const text = document.getElementById("output");
+  text.select();
   document.execCommand("copy");
   alert("Skopiowano!");
 }
-
 </script>
 
 </body>
